@@ -29,12 +29,13 @@
     if(_isObject(options)){
       
       // Intercept the editable and lineSize options
-      var editable = this.getEditable(), 
-          lineSize = this.lineSize;
+      var editable = this.getEditable();
       if(!_isUndefined(options.editable)){
         editable = options.editable;
         delete options.editable;
       }
+      
+      var lineSize = this.getLineSize();
       if(!_isUndefined(options.lineSize)){
         lineSize = options.lineSize;
         delete options.lineSize;
@@ -56,6 +57,10 @@
 
   LargePolygon.prototype.getEditable = function(){
     return this.editable;
+  };
+  
+  LargePolygon.prototype.getLineSize = function(){
+    return this.lineSize;
   };
 
   /**
