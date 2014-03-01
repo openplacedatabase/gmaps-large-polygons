@@ -1,31 +1,26 @@
 (function(){
 
-  /**
-   * Constructor
-   */
-  function LargePolygon(options){
-    this.setOptions(options);
-  }
-
-  // Mount it where the normal Polygons are
-  google.maps.LargePolygon = LargePolygon;
-
-  // LargePolygon extends google.maps.Polygon
-  LargePolygon.prototype = new google.maps.Polygon();
+  var polyProto = google.maps.Polygon.prototype;      
 
   // Default lineSize to 100
-  LargePolygon.prototype.lineSize = 100;
+  polyProto.lineSize = 100;
 
   // Default to normal non-editable state
-  LargePolygon.prototype.editable = false;
+  polyProto.editable = false;
 
   /**
    * Intercept functions that modify the polygon
    * so that we can properly update the lines
    * when necessary
    */
-
-  LargePolygon.prototype.setOptions = function(options){
+   
+  var _setOptions = polyProto.setOptions;
+   
+  /**
+   * Override setOptions so that we can intercept
+   * the editable and lineSize options.
+   */
+  polyProto.setOptions = function(options){
     if(_isObject(options)){
       
       // Intercept the editable and lineSize options
@@ -42,29 +37,33 @@
       }
 
       // Pass other options on to the Polygon
-      google.maps.Polygon.prototype.setOptions.call(this, options);
+      _setOptions.call(this, options);
 
       this.lineSize = lineSize;
       this.setEditable(editable);
     }
   }
-
-  LargePolygon.prototype.setEditable = function(editable){
+ 
+  /**
+   * Intercept the setEditable function so that
+   * we know when to generate the polylines
+   */
+  polyProto.setEditable = function(editable){
     if(_isBoolean(editable)){
       this.editable = editable;
     }
   };
-
-  LargePolygon.prototype.getEditable = function(){
+  
+  polyProto.getEditable = function(){
     return this.editable;
   };
   
-  LargePolygon.prototype.getLineSize = function(){
+  polyProto.getLineSize = function(){
     return this.lineSize;
   };
 
   /**
-   * Lifted from underscore
+   * Utility function lifted from underscore
    */
 
   _isBoolean = function(obj) {
