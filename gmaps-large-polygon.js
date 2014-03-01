@@ -7,45 +7,54 @@
 
   // Default to normal non-editable state
   polyProto.editable = false;
-
-  /**
-   * Intercept functions that modify the polygon
-   * so that we can properly update the lines
-   * when necessary
-   */
-   
-  var _setOptions = polyProto.setOptions;
+  
+  // Default highlight color for edit lines
+  polyProto.highlightColor = '#cccccc';
    
   /**
    * Override setOptions so that we can intercept
    * the editable and lineSize options.
    */
+  var _setOptions = polyProto.setOptions;
   polyProto.setOptions = function(options){
     if(_isObject(options)){
       
-      // Intercept the editable and lineSize options
+      // Intercept the editable option
       var editable = this.getEditable();
       if(!_isUndefined(options.editable)){
         editable = options.editable;
         delete options.editable;
       }
       
-      var lineSize = this.getLineSize();
+      // Intercept the lineSize option
+      var lineSize = this.lineSize;
       if(!_isUndefined(options.lineSize)){
         lineSize = options.lineSize;
         delete options.lineSize;
+      }
+      
+      // Intercept the highlightColor option
+      var highlightColor = this.highlightColor;
+      if(!_isUndefined(options.highlightColor)){
+        highlightColor = options.highlightColor;
+        delete options.highlightColor;
       }
 
       // Pass other options on to the Polygon
       _setOptions.call(this, options);
 
+      // Set the new properties after setting
+      // normal Polygon properties so that we
+      // can be sure to get the last say on
+      // any settings or behavior
       this.lineSize = lineSize;
       this.setEditable(editable);
+      this.highlightColor = highlightColor;
     }
   }
  
   /**
-   * Intercept the setEditable function so that
+   * Override the setEditable function so that
    * we know when to generate the polylines
    */
   polyProto.setEditable = function(editable){
@@ -54,12 +63,13 @@
     }
   };
   
+  /**
+   * Override getEditable since we don't
+   * actually make the underlying polygon
+   * editable
+   */
   polyProto.getEditable = function(){
     return this.editable;
-  };
-  
-  polyProto.getLineSize = function(){
-    return this.lineSize;
   };
 
   /**

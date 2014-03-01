@@ -3,26 +3,35 @@ module("Large Polygon");
 var Polygon = google.maps.Polygon;
 
 test("Default line size", function(){
-  equal(Polygon.prototype.lineSize, new Polygon().getLineSize());
-  equal(new Polygon().getLineSize(), 100);
+  equal(Polygon.prototype.lineSize, new Polygon().lineSize);
+  equal(new Polygon().lineSize, 100);
 })
 
 test("Change global default line size", function(){
   Polygon.prototype.lineSize = 50;
-  equal(new Polygon().getLineSize(), 50);
+  equal(new Polygon().lineSize, 50);
   Polygon.prototype.lineSize = 100;
 })
 
 test("getEditable and setEditable", function(){
   // Start with false, set to true
-  var ep = new Polygon();
-  ok(!ep.getEditable());
-  ep.setEditable(true);
-  ok(ep.getEditable());
+  var poly = new Polygon();
+  ok(!poly.getEditable());
+  poly.setEditable(true);
+  ok(poly.getEditable());
 
   // Start with true, set to false
-  ep = new Polygon({editable:true});
-  ok(ep.getEditable());
-  ep.setEditable(false);
-  ok(!ep.getEditable());
+  poly = new Polygon({editable:true});
+  ok(poly.getEditable());
+  poly.setEditable(false);
+  ok(!poly.getEditable());
 })
+
+test("highlightColor", function(){
+  var poly = new Polygon();
+  equal(Polygon.prototype.highlightColor, poly.highlightColor);
+  poly.setOptions({
+    highlightColor: '#111111'
+  });
+  equal(poly.highlightColor, '#111111');
+});
