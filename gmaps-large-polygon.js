@@ -60,6 +60,9 @@
   polyProto.setEditable = function(editable){
     if(_isBoolean(editable)){
       this.editable = editable;
+      if(editable){
+        this.generateEditLines();
+      }
     }
   };
   
@@ -70,6 +73,71 @@
    */
   polyProto.getEditable = function(){
     return this.editable;
+  };
+  
+  /**
+   * Create the edit lines
+   */
+  polyProto.generateEditLines = function(){
+    
+    var self = this,
+        map = self.getMap(),
+        lineStyle = {
+          strokeColor: self.get('strokeColor'),
+          strokeOpacity: self.get('strokeOpacity'),
+          strokeWeight: self.get('strokeWeight')
+        };
+    
+    // Process each path independently
+    this.getPaths().forEach(function(path, pathIndex){
+
+      var lineLengths = _lineLengths(path.getLength(), self.lineSize),
+          lines = [];
+      
+      // Iterate over each edit line
+      var position = 0;
+      for(var i = 0; i < lineLengths.length; i++){
+        var newLinePath = [],
+            end = Math.min(position + lineLengths[i], path.getLength());
+        
+        // Add the relevent points to the line's path
+        for(; position < end; position++){
+          newLinePath.push(path.getAt(position));
+        }
+        
+        // Decrement position by 1 so that the next
+        // line duplicates the last point of this line
+        position--;
+        
+        // Create the google maps line object
+        // and style it to match the polygon's borders
+        var line = new google.maps.Polyline();
+        line.setPath(newLinePath);
+        line.setOptions(lineStyle);
+        line.setMap(map);
+        
+        // Add events
+        line.addListener('click', function(){
+          this.setEditable(true);
+        });
+        line.addListener('mouseover', function(){
+          this.set('strokeColor', self.highlightColor);
+        });
+        line.addListener('mouseout', function(){
+          this.setOptions(lineStyle);
+        });
+        
+        // Save the line
+        lines.push(line);
+      }
+      
+      // Add the first point of the path to the end of the last line
+      lines[lines.length-1].getPath().push(path.getAt(0));
+      
+      // Setup event listeners on the line's paths so that
+      // we can update the shape appropriately
+
+    });
   };
   
   /**
@@ -179,7 +247,7 @@
   /**
    * Expose some internal functions when testing
    */
-  if(GMAPS_LARGE_POLYGON_TESTING){
+  if(window.GMAPS_LARGE_POLYGON_TESTING){
     window.gmlp = {
       _lineLengths: _lineLengths,
       _numLines: _numLines

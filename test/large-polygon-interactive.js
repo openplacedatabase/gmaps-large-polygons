@@ -9,8 +9,12 @@ var shapeStyle = {
   "strokeOpacity": 1,
   "strokeWeight": 3,
   "fillColor": "#9999ff",
-  "fillOpacity": 0.3
+  "fillOpacity": 0.3,
+  editable: true,
+  highlightColor: '#111111'
 };
+
+var poly;
 
 $(document).ready(function(){
   
@@ -22,9 +26,9 @@ $(document).ready(function(){
   //
   
   // Create a polygon with a lot of points and add it to the map
-  var poly = google.maps.geojson.from(geojsonPolygon);
-  poly.setOptions(shapeStyle);
-  poly.setMap(map);        
+  poly = google.maps.geojson.from(geojsonPolygon);
+  poly.setMap(map);
+  poly.setOptions(shapeStyle);       
   map.fitBounds(poly.getBounds());
   
   // Make the polygon editable when clicked
