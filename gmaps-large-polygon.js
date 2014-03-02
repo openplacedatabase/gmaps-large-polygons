@@ -71,9 +71,18 @@
   polyProto.getEditable = function(){
     return this.editable;
   };
+  
+  /**
+   * Calculate number of edit lines
+   */
+  function _numLines(pathLength, lineSizeLimit){
+    // Subtract one frome lineSizeLimit to account for
+    // overlapping points at the edges.
+    return Math.ceil(pathLength / (lineSizeLimit - 1));
+  };
 
   /**
-   * Utility function lifted from underscore
+   * Utility functions lifted from underscore
    */
 
   _isBoolean = function(obj) {
@@ -95,5 +104,14 @@
   _isArray = Array.isArray || function(obj) {
     return toString.call(obj) == '[object Array]';
   };
+  
+  /**
+   * Expose some internal functions when testing
+   */
+  if(GMAPS_LARGE_POLYGON_TESTING){
+    window.gmlp = {
+      _numLines: _numLines
+    };
+  }
 
 }());
