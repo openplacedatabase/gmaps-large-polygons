@@ -73,12 +73,83 @@
   };
   
   /**
+   * Calculate length of each edit line.
+   * Returns an array of numbers which represent
+   * the length. Tries to even out the length of 
+   * the lines as best it can.
+   */
+  function _lineLengths(pathLength, lineSizeLimit){
+    
+    // Short circuit if there will only be one edit line
+    if(lineSizeLimit >= pathLength){
+      return [pathLength];
+    }
+    
+    var rawNum = _numLines(pathLength, lineSizeLimit),
+        numLines = Math.floor(rawNum),
+        remainder = rawNum - numLines,
+        lineLengths = [];
+    
+    // If lineSizeLimit divides into pathLenght evenly
+    // then just return an array of length numLines
+    // filled with lineSizeLimit.
+    lineLengths = _numberArray(lineSizeLimit, numLines);
+    
+    // If lineSize doesn't divide into the pathLength evently
+    // then try to even out the lengths of the lines.
+    if(remainder) {
+      var lastLength = Math.ceil(lineSizeLimit * remainder);
+      
+      // The last line cannot have 1 point
+      if(lastLength < 2){
+        lastLength = 2;
+      }
+      
+      lineLengths.push(lastLength);
+      
+      // Starting at the second to last number (skip the
+      // number we just pushed on), iterate backwards
+      // over the array and decrement the numbers by one
+      // until we make up the difference between the
+      // lastLength and the LineSizeLimit
+      
+      var difference = lineSizeLimit - lastLength - 1,
+          i = lineLengths.length - 2,
+          last = lineLengths.length - 1;
+          
+      while(difference > 0){
+        // Allow i to wrap back to the end
+        if(i < 0){
+          i = lineLengths.length - 1;
+        }
+        lineLengths[i] = lineLengths[i] - 1;
+        difference--; 
+        i--; 
+        lineLengths[last]++;
+      }            
+    }
+    
+    return lineLengths;
+  };
+  
+  /**
+   * Generate an array filled with a given number
+   */
+  function _numberArray(number, length){
+    var array = [];
+    for(var i = 0; i < length; i++){
+      array[i] = number;
+    }
+    return array;
+  };
+  
+  /**
    * Calculate number of edit lines
    */
   function _numLines(pathLength, lineSizeLimit){
     // Subtract one frome lineSizeLimit to account for
     // overlapping points at the edges.
-    return Math.ceil(pathLength / (lineSizeLimit - 1));
+    return pathLength / (lineSizeLimit - 1);
   };
 
   /**
@@ -110,6 +181,7 @@
    */
   if(GMAPS_LARGE_POLYGON_TESTING){
     window.gmlp = {
+      _lineLengths: _lineLengths,
       _numLines: _numLines
     };
   }

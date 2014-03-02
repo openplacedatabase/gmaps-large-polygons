@@ -36,19 +36,18 @@ test("highlightColor", function(){
   equal(poly.highlightColor, '#111111');
 });
 
-test("_numLines", function(){
+test("_lineLengths", function(){
   var tests = [
-    [4, 3, 2],
-    [4, 2, 4],
-    [5, 2, 5],
-    [5, 3, 3],
-    [5, 4, 2],
-    [10, 2, 10],
-    [10, 6, 2],
-    [10, 5, 3]
+    [4, 3, [3, 3]],
+    [4, 2, [2, 2, 2, 2]],
+    [5, 3, [3, 3, 2]],
+    [5, 4, [4, 3]],
+    [5, 5, [5]],
+    [9, 7, [6, 5]],
+    [9, 8, [6, 5]]
   ];
   for(var i = 0; i < tests.length; i++){
     var t = tests[i];
-    equal(gmlp._numLines(t[0], t[1]), t[2]);
+    deepEqual(gmlp._lineLengths(t[0], t[1]), t[2]);
   }
 });
