@@ -138,7 +138,8 @@
       
       // Keep track of whether a point event was fired
       // by the user or by us updating a neighbor point
-      var updatingNeighbor = false;
+      var updatingNeighbor = false,
+          fireChangeEvent = true;
       
       // Setup event listeners on the line's paths so that
       // we can update the underlying shape when the lines change
@@ -146,12 +147,12 @@
         
         // New point
         line.getPath().addListener('insert_at', function(){
-          self.updateFromLines(pathIndex, lines);
+          self.updateFromLines(pathIndex, lines, fireChangeEvent);
         });
         
         // Point removed
         line.getPath().addListener('remove_at', function(){
-          self.updateFromLines(pathIndex, lines);
+          self.updateFromLines(pathIndex, lines, fireChangeEvent);
         });
         
         // Point moved
@@ -173,7 +174,7 @@
           // point after the user moved a first/last point
           else {
             updatingNeighbor = false;
-            self.updateFromLines(pathIndex, lines);
+            self.updateFromLines(pathIndex, lines, fireChangeEvent);
           }
         });
         
@@ -196,7 +197,9 @@
             if(vertex === 0 || vertex === this.getPath().getLength()){
               var neighbor = findNeighbor(lines, this, vertex),
                   newEndIndex = vertex === 0 ? 0 : this.getPath().getLength() - 1;
+              fireChangeEvent = false;
               neighbor.path.setAt(neighbor.index, this.getPath().getAt(newEndIndex));
+              fireChangeEvent = true;
             }
             
             // If there is only one point left then delete the line.
@@ -230,7 +233,7 @@
    * path of the shape based on the lines that were
    * derived from it
    */
-  polyProto.updateFromLines = function(pathIndex, lines){
+  polyProto.updateFromLines = function(pathIndex, lines, fireEvent){
     var newPoints = [];
     for(var i = 0; i < lines.length; i++){
       var linePath = lines[i].getPath(),
@@ -244,8 +247,9 @@
       });
     }
     this.getPaths().setAt(pathIndex, new google.maps.MVCArray(newPoints));
-    // This gets fired twice when deleting the ends of edit lines
-    // google.maps.event.trigger(this, 'changed');
+    if(fireEvent){
+      google.maps.event.trigger(this, 'changed');
+    }
   };
   
   /**
