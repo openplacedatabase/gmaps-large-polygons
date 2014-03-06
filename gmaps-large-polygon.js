@@ -120,6 +120,9 @@
         
         // Add events
         line.addListener('click', function(){
+          _forEach(lines, function(i, line){
+            line.setEditable(false);
+          });
           this.setEditable(true);
         });
         line.addListener('mouseover', function(){
