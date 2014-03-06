@@ -143,7 +143,7 @@
       
       // Setup event listeners on the line's paths so that
       // we can update the underlying shape when the lines change
-      $.each(lines, function(i, line){
+      _forEach(lines, function(i, line){
         
         // New point
         line.getPath().addListener('insert_at', function(){
@@ -383,6 +383,12 @@
 
   _isArray = Array.isArray || function(obj) {
     return toString.call(obj) == '[object Array]';
+  };
+  
+  _forEach = function(array, func){
+    for(var i = 0; i < array.length; i++){
+      func.call(func, i, array[i]);
+    }
   };
   
   /**
