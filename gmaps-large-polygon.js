@@ -216,8 +216,6 @@
               // the ordering and make pathIndex irrelevent and break
               // a lot of code
             }
-            
-            // TODO: fire changed event
           }
         });
       });
@@ -246,7 +244,8 @@
       });
     }
     this.getPaths().setAt(pathIndex, new google.maps.MVCArray(newPoints));
-    // TODO: Fire changed event
+    // This gets fired twice when deleting the ends of edit lines
+    // google.maps.event.trigger(this, 'changed');
   };
   
   /**
