@@ -376,16 +376,8 @@
     return obj === void 0;
   };
 
-  _isString = function(obj){
-    return toString.call(obj) == '[object String]';
-  };
-
   _isObject = function(obj) {
     return obj === Object(obj);
-  };
-
-  _isArray = Array.isArray || function(obj) {
-    return toString.call(obj) == '[object Array]';
   };
   
   _forEach = function(array, func){
