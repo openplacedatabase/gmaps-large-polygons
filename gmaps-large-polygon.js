@@ -10,6 +10,8 @@
   
   // Default highlight color for edit lines
   polyProto.highlightColor = '#cccccc';
+  
+  polyProto.editLines = [];
    
   /**
    * Override setOptions so that we can intercept
@@ -134,10 +136,104 @@
       // Add the first point of the path to the end of the last line
       lines[lines.length-1].getPath().push(path.getAt(0));
       
+      // Keep track of whether a point event was fired
+      // by the user or by us updating a neighbor point
+      var updatingNeighbor = false;
+      
       // Setup event listeners on the line's paths so that
-      // we can update the shape appropriately
+      // we can update the underlying shape when the lines change
+      $.each(lines, function(i, line){
+        
+        // New point
+        line.getPath().addListener('insert_at', function(){
+          self.updateFromLines(pathIndex, lines);
+        });
+        
+        // Point removed
+        line.getPath().addListener('remove_at', function(){
+          self.updateFromLines(pathIndex, lines);
+        });
+        
+        // Point moved
+        line.getPath().addListener('set_at', function(vertex){
+          
+          // When either the first or last point was moved we need
+          // to move the matching point of the neighboring line.
+          // Because lines may be deleted (unlikely, but possible)
+          // we have to figure out the line's position and neighbors
+          // at runtime.
+          if((vertex === 0 || vertex === this.getLength() - 1) && !updatingNeighbor){
+            var neighbor = findNeighbor(lines, line, vertex);
+            updatingNeighbor = true;
+            neighbor.path.setAt(neighbor.index, this.getAt(vertex));
+          } 
+          
+          // Update underlying shape with changes only if we're moving
+          // a point in the middle of the line or we're updating a neighbor
+          // point after the user moved a first/last point
+          else {
+            updatingNeighbor = false;
+            self.updateFromLines(pathIndex, lines);
+          }
+        });
+        
+        // Deleting a point
+        // http://stackoverflow.com/a/14441786
+        line.addListener('rightclick', function(event){
+          var vertex = event.vertex;
+          
+          if(vertex != null){
+            
+            // Remove the point
+            this.getPath().removeAt(event.vertex);
+            
+            // If the point being removed is the first or last
+            // point in the line then we need to find and move
+            // the neigbor's point to match our new end point.
+            if(vertex === 0 || vertex === this.getPath().getLength()){
+              var neighbor = findNeighbor(lines, this, vertex),
+                  newEndIndex = vertex === 0 ? 0 : this.getPath().getLength() - 1;
+              neighbor.path.setAt(neighbor.index, this.getPath().getAt(newEndIndex));
+            }
+            
+            // If there if only one point left then delete the line.
+            // It's neghbors should both be overlapping the last remaining point.
+            if(this.getPath().getLength() === 1){
+              this.setMap(null);
+              var linePos = lines.indexOf(this);
+              lines.splice(linePos, 1);
+            }            
+
+            // TODO: handle deleting entire paths
+          }
+        });
+      });
+      
+      self.editLines = self.editLines.concat(lines);
 
     });
+  };
+  
+  /** 
+   * Called whenever lines change; updates the specified
+   * path of the shape based on the lines that were
+   * derived from it
+   */
+  polyProto.updateFromLines = function(pathIndex, lines){
+    var newPoints = [];
+    for(var i = 0; i < lines.length; i++){
+      var linePath = lines[i].getPath(),
+          lineLength = linePath.getLength();
+      linePath.forEach(function(point, j){
+        // Don't add the last point of each line
+        // because those are duplicated
+        if(j !== lineLength - 1){
+          newPoints.push(point);
+        }
+      });
+    }
+    this.getPaths().setAt(pathIndex, new google.maps.MVCArray(newPoints));
+    // TODO: Fire changed event
   };
   
   /**
