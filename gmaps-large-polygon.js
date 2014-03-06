@@ -177,8 +177,11 @@
           }
         });
         
-        // Deleting a point
-        // http://stackoverflow.com/a/14441786
+        // Deleting a point when rightclicked.
+        // updateFromLines is not called here to update the polygon
+        // because we modify the lines which fire the event listeners
+        // bound above which then call updateFromLines
+        // Inspired by http://stackoverflow.com/a/14441786
         line.addListener('rightclick', function(event){
           var vertex = event.vertex;
           
@@ -196,15 +199,25 @@
               neighbor.path.setAt(neighbor.index, this.getPath().getAt(newEndIndex));
             }
             
-            // If there if only one point left then delete the line.
-            // It's neghbors should both be overlapping the last remaining point.
+            // If there is only one point left then delete the line.
+            // It's neghbors should both be overlapping now.
             if(this.getPath().getLength() === 1){
               this.setMap(null);
               var linePos = lines.indexOf(this);
               lines.splice(linePos, 1);
             }            
 
-            // TODO: handle deleting entire paths
+            // Delete the entire path if there is less than
+            // three points left; with only one or two points
+            // you don't have a polygon
+            if(self.getPaths().getAt(pathIndex).getLength() < 3){
+              self.getPaths().removeAt(pathIndex);
+              // If this path isn't the last one then it will change
+              // the ordering and make pathIndex irrelevent and break
+              // a lot of code
+            }
+            
+            // TODO: fire changed event
           }
         });
       });
@@ -234,6 +247,35 @@
     }
     this.getPaths().setAt(pathIndex, new google.maps.MVCArray(newPoints));
     // TODO: Fire changed event
+  };
+  
+  /**
+   * Finds the neighboring path and point index for
+   * updating a neighbor's matching end point.
+   */
+  function findNeighbor(lines, line, pointIndex){
+    var numLines = lines.length,
+        lineIndex = lines.indexOf(line),
+        neighborLineIndex, neighborPath, neighborPointIndex;
+    
+    // First point in line
+    if(pointIndex === 0){
+      neighborLineIndex = lineIndex === 0 ? numLines - 1 : lineIndex - 1;
+      neighborPath = lines[neighborLineIndex].getPath();
+      neighborPointIndex = neighborPath.getLength() - 1;
+    }
+    
+    // Last point in line
+    else {
+      neighborLineIndex = lineIndex === numLines - 1 ? 0 : lineIndex + 1;
+      neighborPath = lines[neighborLineIndex].getPath();
+      neighborPointIndex = 0;
+    }
+    
+    return {
+      path: neighborPath,
+      index: neighborPointIndex
+    };
   };
   
   /**
