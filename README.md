@@ -10,3 +10,5 @@ polygon's borders to be editable at a time.
 ````javascript
 var polygon = new google.maps.Polygon(options);
 ````
+
+See the [demo](http://openplacedatabase.github.io/gmaps-large-polygon/).
