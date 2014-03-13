@@ -2,8 +2,8 @@ gmaps-large-polygon
 ============================
 
 gmaps-large-polygons makes it possible to edit large Google Maps [Polygons](https://developers.google.com/maps/documentation/javascript/reference#Polygon). 
-Without it, it's nigh impossible to edit polygons with more than a few thousand 
-points without crashing the browser due to allocating so many objects and handlers 
+Without it, it's nigh [impossible to edit large polygons](http://stackoverflow.com/q/20647124/879121)
+without crashing the browser due to allocating so many objects and handlers 
 for the vertexes. gmaps-large-polygons fixes this by only allowing a small portion of the 
 polygon's borders to be editable at a time.
 
