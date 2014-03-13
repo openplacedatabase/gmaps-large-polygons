@@ -274,7 +274,7 @@
     this.path = new google.maps.MVCArray(newPoints)
     this.polygon.getPaths().setAt(pathIndex, this.path);
     if(fireEvent){
-      google.maps.event.trigger(this.polygon, 'changed');
+      google.maps.event.trigger(this.polygon, 'edited');
     }
   };
   
