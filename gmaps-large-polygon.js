@@ -9,7 +9,7 @@
   polyProto.editable = false;
   
   // Default highlight color for edit lines
-  polyProto.highlightColor = '#cccccc';
+  polyProto.highlightColor = '#000000';
   
   polyProto.editLines = [];
    
