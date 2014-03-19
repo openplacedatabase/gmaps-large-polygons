@@ -16,11 +16,17 @@ If you never mark the polygons as editable, or if the number of points is less t
 
 See the [demo](http://openplacedatabase.github.io/gmaps-large-polygons/).
 
-### Additional Options
+### Options
 
-You may use all of the normal options for [Polygons](https://developers.google.com/maps/documentation/javascript/reference#Polygon). gmaps-large-polygons makes these additional options available:
+You may use all of the regular options for [Polygons](https://developers.google.com/maps/documentation/javascript/reference#PolygonOptions). gmaps-large-polygons makes these additional options available:
 
 option  | default | description
 ------------- | ------------- | -------------
 `lineSize`  | `100` | The max number of points which an editable line segment will have. Segments may have less than this number but they will _never_ have more.
 `highlightColor`  | `#000000` | The color that line segments will turn when hovered over for selecting before editing. It can be difficult to get the mouse in the right spot for selection so this helps indicate whether the mouse is in the proper spot for selection.
+
+### Events
+
+You may use all of the regular events for [Polygons](https://developers.google.com/maps/documentation/javascript/reference#Polygon).
+
+We also make available a new `edited` event that is triggered whenever a point in any of the polygon's paths is added, moved, or deleted.
