@@ -1,4 +1,4 @@
-gmaps-large-polygon
+gmaps-large-polygons
 ============================
 
 gmaps-large-polygons makes it possible to edit large Google Maps [Polygons](https://developers.google.com/maps/documentation/javascript/reference#Polygon). 
@@ -6,13 +6,19 @@ Without it, it's nigh [impossible to edit large polygons](http://stackoverflow.c
 without crashing the browser. gmaps-large-polygons fixes this by only allowing a small portion of the 
 polygon's borders to be editable at a time.
 
+gmaps-large-polygons works by extending the regular Polygon object so you can continue using polygons as you did before.
+
 ````javascript
 var polygon = new google.maps.Polygon(options);
 ````
 
-See the [demo](http://openplacedatabase.github.io/gmaps-large-polygon/).
+If you never mark the polygons as editable, or if the number of points is less than the `lineSize`, then the polygons will behave like normal polygons. 
 
-### Options
+See the [demo](http://openplacedatabase.github.io/gmaps-large-polygons/).
+
+### Additional Options
+
+You may use all of the normal options for [Polygons](https://developers.google.com/maps/documentation/javascript/reference#Polygon). gmaps-large-polygons makes these additional options available:
 
 option  | default | description
 ------------- | ------------- | -------------
