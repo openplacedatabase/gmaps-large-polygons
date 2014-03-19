@@ -29,4 +29,4 @@ option  | default | description
 
 You may use all of the regular events for [Polygons](https://developers.google.com/maps/documentation/javascript/reference#Polygon).
 
-We also make available a new `edited` event that is triggered whenever a point in any of the polygon's paths is added, moved, or deleted.
+We also make available a new `edited` event that is triggered whenever a point in any of the polygon's paths is added, moved, or deleted. No arguments are passed to the event handlers for this.
